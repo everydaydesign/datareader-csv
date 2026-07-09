@@ -1,0 +1,57 @@
+{
+  "name": "datareader-csv",
+  "version": "0.1.0",
+  "description": "Correct, zero-dependency CSV/TSV/delimited-text reader for the browser and Node.",
+  "license": "MIT",
+  "author": "everydaydesign",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "csv",
+    "tsv",
+    "txt",
+    "dsv",
+    "delimited",
+    "rfc4180",
+    "parser",
+    "reader",
+    "browser",
+    "data",
+    "datareader"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/everydaydesign/datareader-csv.git"
+  },
+  "homepage": "https://github.com/everydaydesign/datareader-csv#readme",
+  "bugs": "https://github.com/everydaydesign/datareader-csv/issues",
+  "scripts": {
+    "build": "tsup",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "tsup && bun test"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.14",
+    "@types/papaparse": "^5.3.14",
+    "papaparse": "^5.4.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.7.2"
+  }
+}
