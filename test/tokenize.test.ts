@@ -37,4 +37,8 @@ describe("tokenize (RFC-4180)", () => {
   test("honors a non-comma delimiter", () => {
     expect(tokenize("a;b;c", ";", true)).toEqual([["a", "b", "c"]]);
   });
+  test("trim skips a QUOTED field's protected whitespace but still trims the adjacent unquoted one", () => {
+    // The quoted cell keeps its padding; the next (unquoted) cell trims — proves wasQuoted resets.
+    expect(tokenize('"  padded  ", y ', ",", true)).toEqual([["  padded  ", "y"]]);
+  });
 });

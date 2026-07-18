@@ -75,4 +75,28 @@ describe("readCsv", () => {
   test("throws CsvError when the grid exceeds maxCells", () => {
     expect(() => readCsv("a,b\n1,2\n3,4", { maxCells: 3 })).toThrow(CsvError);
   });
+
+  test("a grid with exactly maxCells cells is accepted; one over throws (boundary is `>`)", () => {
+    expect(() => readCsv("a,b\nc,d", { maxCells: 4, typed: false })).not.toThrow(); // 2×2 = 4 cells
+    expect(() => readCsv("a,b\nc,d", { maxCells: 3, typed: false })).toThrow(CsvError);
+  });
+
+  test("a quote-bearing semicolon file (comma-bearing quoted labels) sniffs as semicolon, not comma", () => {
+    const r = readCsv('"Q, one";"Q, two";Q3\n1;2;3', { typed: false });
+    expect(r.delimiter).toBe(";");
+    expect(r.rows).toEqual([
+      ["Q, one", "Q, two", "Q3"],
+      ["1", "2", "3"],
+    ]);
+  });
+
+  test("preserves protected whitespace inside a quoted field (trim skips quoted cells)", () => {
+    const r = readCsv('"  padded  ",x\n1,2', { typed: false });
+    expect(r.rows[0]).toEqual(["  padded  ", "x"]);
+  });
+
+  test("throws CsvError on a non-UTF-8 byte stream instead of corrupting names", () => {
+    // A Windows-1252 'é' (0xE9) is an invalid lone UTF-8 byte.
+    expect(() => readCsv(new Uint8Array([0x61, 0xe9, 0x2c, 0x62]))).toThrow(CsvError);
+  });
 });

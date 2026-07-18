@@ -70,6 +70,6 @@ describe("RFC-4180 conformance (seeded from EasyPLS)", () => {
     const r = readCsv(qualtrics, { typed: false });
     expect(r.rows).toHaveLength(4);
     expect(r.rows.every((row) => row.length === 3)).toBe(true);
-    expect(r.rows[2][0]).toBe('{"ImportId":"startDate"}');
+    expect(r.rows[2]![0]).toBe('{"ImportId":"startDate"}');
   });
 });

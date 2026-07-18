@@ -8,11 +8,16 @@ type Scan = {
   rows: string[][];
   text: string;
   trim: boolean;
+  /** True once the current field has OPENED on a quote — its content is then protected from trim. */
+  wasQuoted: boolean;
 };
 
 function endField(s: Scan): void {
-  s.row.push(s.trim ? s.field.trim() : s.field);
+  // Quoted content is significant per RFC 4180 (intentional surrounding whitespace inside quotes must
+  // survive), so trim skips a field that opened on a quote. Unquoted fields still trim as before.
+  s.row.push(s.trim && !s.wasQuoted ? s.field.trim() : s.field);
   s.field = "";
+  s.wasQuoted = false;
 }
 
 function endRow(s: Scan): void {
@@ -50,6 +55,7 @@ function scanUnquoted(s: Scan): void {
   }
   switch (ch) {
     case '"': {
+      if (s.field === "") s.wasQuoted = true; // opens a quoted field only when it's the first char
       s.quoted = true;
       s.i += 1;
       break;
@@ -73,9 +79,20 @@ function scanUnquoted(s: Scan): void {
 
 /** RFC-4180 tokenizer: rows of raw string cells honoring quoted fields (embedded
  * delimiters/newlines literal, `""` escapes a quote) and `\r\n`/`\r`/`\n` breaks. A final newline
- * leaves no empty trailing row. Cells are trimmed when `trim` is set. */
+ * leaves no empty trailing row. Cells are trimmed when `trim` is set — except quoted fields, whose
+ * content is significant and kept verbatim. */
 export function tokenize(text: string, delimiter: string, trim: boolean): string[][] {
-  const s: Scan = { delimiter, field: "", i: 0, quoted: false, row: [], rows: [], text, trim };
+  const s: Scan = {
+    delimiter,
+    field: "",
+    i: 0,
+    quoted: false,
+    row: [],
+    rows: [],
+    text,
+    trim,
+    wasQuoted: false,
+  };
   while (s.i < text.length) {
     if (s.quoted) scanQuoted(s);
     else scanUnquoted(s);

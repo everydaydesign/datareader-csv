@@ -8,12 +8,12 @@ export type CsvOptions = {
   delimiter?: string;
   /** Treat row 0 as a header: return it as `header` and exclude it from `rows`. Default false. */
   header?: boolean;
-  /** Infer numbers and map blank cells to null. false keeps every cell a (trimmed) string. Default true. */
-  typed?: boolean;
-  /** Trim whitespace around each cell. Default true. */
-  trim?: boolean;
   /** Reject inputs whose grid exceeds this many cells (rows × columns). Default 5,000,000. */
   maxCells?: number;
+  /** Trim whitespace around each cell. Default true. */
+  trim?: boolean;
+  /** Infer numbers and map blank cells to null. false keeps every cell a (trimmed) string. Default true. */
+  typed?: boolean;
 };
 
 /** The result of {@link readCsv}. */

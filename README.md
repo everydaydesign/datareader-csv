@@ -235,12 +235,12 @@ readCsv("code\n007", { typed: false }).rows;
 
 | Area         | Handled                                                                              |
 | ------------ | ------------------------------------------------------------------------------------ |
-| Delimiters   | `,` `;` `\t` sniffed from the first non-empty line (comma fallback); any single character via `delimiter` |
+| Delimiters   | `,` `;` `\t` sniffed **quote-awarely** — a sample is tokenized under each candidate and the one yielding the most cells wins, so delimiters inside quoted fields don't miscount (comma breaks ties); any single character via `delimiter` |
 | Quoting      | `"…"` fields with embedded delimiters and newlines; `""` escapes a literal quote      |
 | Line endings | `\r\n`, `\r`, and `\n`; a trailing newline adds no empty row                          |
 | BOM          | a single leading UTF-8 BOM (U+FEFF) is stripped                                       |
-| Encoding     | UTF-8, decoded via `TextDecoder` (`ArrayBuffer`/`Uint8Array` in, string out)         |
-| Whitespace   | each cell trimmed by default (`trim: false` keeps it)                                 |
+| Encoding     | UTF-8, plus **UTF-16** (LE/BE) selected by BOM (`ArrayBuffer`/`Uint8Array` in). Bytes that aren't valid UTF-8/UTF-16 throw a `CsvError` — never a silent U+FFFD |
+| Whitespace   | each **unquoted** cell trimmed by default (`trim: false` keeps it); a quoted field's content is significant and never trimmed |
 
 ## Security & limits
 
@@ -274,10 +274,9 @@ Recommendations for consumers:
 `datareader-csv` reads delimited text correctly today and is intentionally **read-only** (no writer). On
 the map for future releases:
 
-- **Multi-line delimiter sniff** — the delimiter is currently guessed from the first non-empty line;
-  sampling several lines would harden the guess on ragged files.
-- **More encodings** — input is decoded as UTF-8 today; declared or alternate encodings (e.g.
-  windows-125x) via `TextDecoder` are a natural extension.
+- **More encodings** — UTF-8 and UTF-16 are handled today (UTF-16 by BOM); a declared or
+  content-detected single-byte fallback (e.g. windows-1252) via `TextDecoder` is a natural extension
+  — for now such files fail loud with a `CsvError` rather than corrupting silently.
 - **Streaming** — a chunked API for files too large to hold in memory, alongside today's
   whole-string read.
 

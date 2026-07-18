@@ -1,6 +1,6 @@
 {
   "name": "datareader-csv",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Correct, zero-dependency CSV/TSV/delimited-text reader for the browser and Node.",
   "license": "MIT",
   "author": "everydaydesign",
